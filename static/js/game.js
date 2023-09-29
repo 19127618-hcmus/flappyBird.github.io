@@ -109,7 +109,7 @@ function createObject(speed) {
         myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale1.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * (areaHeight / 3) + 1)), "image"))
         myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale1.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * ((areaHeight / 3) * 2 - areaHeight / 3 + 1) + areaHeight / 3)), "image"));
         myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale1.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * (areaHeight - areaHeight / 3 * 2 - 15) + areaHeight / 3 * 2 - 15)), "image"));
-        myGift.push(new component(tubeWidth, tubeHeight, "static/images/fist1.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image"))
+        myGift.push(new component(tubeWidth, tubeHeight, "static/images/fish1.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image"))
         myPrank.push(new component(tubeWidth, tubeHeight, "static/images/penguinBull1.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image"))
     }
 
