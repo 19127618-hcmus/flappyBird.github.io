@@ -36,7 +36,15 @@ var myGameArea = {
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.frameNo = 0;
         this.interval = setInterval(updateGameArea, 20);
-
+        window.addEventListener('keydown', function (e) {
+            myGameArea.keys = (myGameArea.keys || []);
+            myGameArea.keys[e.keyCode] = (e.type == "keydown");
+            myGamePiece.image.src = "static/images/penguinFly2.png";
+        })
+        window.addEventListener('keyup', function (e) {
+            myGameArea.keys[e.keyCode] = (e.type == "keydown");       
+            clearMove()     
+        })
     },
     clear: function () {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -218,11 +226,14 @@ function updateGameArea() {
     myScore.text = "Score: " + score;
     myScore.update();
 
-
+    if(myGameArea.keys && myGameArea.keys[38]){myGamePiece.speedY=-1;}
+    if(myGameArea.keys && myGameArea.keys[40]){myGamePiece.speedY=1;}
 
     myGamePiece.newPos();
     myGamePiece.update();
+    
 }
+
 
 
 
@@ -240,6 +251,8 @@ function move(dir) {
         //     break;
         // case "right":
         //     myGamePiece.speedX = 2;
+
+       
     }
 }
 
