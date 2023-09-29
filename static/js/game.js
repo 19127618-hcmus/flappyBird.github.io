@@ -17,7 +17,7 @@ const tubeHeight = 60;
 const optimizeGiftSize = 35;
 
 function startGame() {
-    myBackground = new component(1200, 640, "static/images/sea3.png", 0, 0, "background");
+    myBackground = new component(window.innerWidth,  window.innerHeight*60/100, "static/images/sea3.png", 0, 0, "background");
     myGamePiece = new component(birtWidth, birtHeight, "static/images/penguinFly1.png", 40, 200, "image");
     myScore = new component("30px", "Consolas", "black", 400, 40, "text");
     eatSound = new sound("static/sound/eating.MP3");
@@ -29,8 +29,8 @@ function startGame() {
 var myGameArea = {
     canvas: document.createElement("canvas"),
     start: function () {
-        this.canvas.width = 960;
-        this.canvas.height = 480;
+        this.canvas.width = window.innerWidth*90/100;
+        this.canvas.height = window.innerHeight*50/100;
         this.canvas.id = ("canvas-game")
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
@@ -42,8 +42,8 @@ var myGameArea = {
             myGamePiece.image.src = "static/images/penguinFly2.png";
         })
         window.addEventListener('keyup', function (e) {
-            myGameArea.keys[e.keyCode] = (e.type == "keydown");       
-            clearMove()     
+            myGameArea.keys[e.keyCode] = (e.type == "keydown");
+            clearMove()
         })
     },
     clear: function () {
@@ -72,7 +72,7 @@ function component(width, height, color, x, y, type, speed) {
         ctx = myGameArea.context;
         if (type == "background") {
             ctx.drawImage(this.image, this.x + this.width, this.y, this.width, this.height);
-        } 
+        }
         if (this.type == "text") {
             ctx.font = this.width + " " + this.height;
             ctx.fillStyle = color;
@@ -80,7 +80,7 @@ function component(width, height, color, x, y, type, speed) {
         } else if (type == "image" || type == "background") {
             ctx.drawImage(this.image,
                 this.x, this.y, this.width, this.height)
-        }else {
+        } else {
             ctx.fillStyle = color;
             ctx.fillRect(this.x, this.y, this.width, this.height);
         }
@@ -98,7 +98,6 @@ function component(width, height, color, x, y, type, speed) {
             if (this.x == -(this.width)) { this.x = 0 }
         }
     }
-
     this.crashWith = function (otherObject) {
         var myLeft = this.x;
         var myRight = this.x + this.width;
@@ -111,7 +110,7 @@ function component(width, height, color, x, y, type, speed) {
         var otherObjectBottom = otherObject.y + otherObject.height;
 
         var crash = true;
-        if (myBottom < otherObjectTop + 2 || myTop > otherObjectBottom - 5 || myRight < otherObjectLeft + 2 || myLeft > otherObjectRight - 5) {
+        if (myBottom < otherObjectTop + 10 || myTop > otherObjectBottom - 10 || myRight < otherObjectLeft + 10 || myLeft > otherObjectRight - 10) {
             crash = false;
         }
         return crash;
@@ -150,8 +149,8 @@ function createObject(speed) {
         myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale2.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * (areaHeight / 3) + 1)), "image"));
         myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale2.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * ((areaHeight / 3) * 2 - areaHeight / 3 + 1) + areaHeight / 3)), "image", "speed"));
         myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale2.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * (areaHeight - areaHeight / 3 * 2 - 15) + areaHeight / 3 * 2 - 15)), "image", "speed"));
-        myGift.push(new component(tubeWidth, tubeHeight-optimizeGiftSize, "static/images/fish2.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image", "speed"));
-        myPrank.push(new component(tubeWidth-optimizeGiftSize, tubeHeight-optimizeGiftSize+5, "static/images/penguinBull1.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image", "speed"));
+        myGift.push(new component(tubeWidth, tubeHeight - optimizeGiftSize, "static/images/fish2.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image", "speed"));
+        myPrank.push(new component(tubeWidth - optimizeGiftSize, tubeHeight - optimizeGiftSize + 5, "static/images/penguinBull1.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image", "speed"));
     }
 
     createObstacle(myObstacles, speed);
@@ -226,15 +225,12 @@ function updateGameArea() {
     myScore.text = "Score: " + score;
     myScore.update();
 
-    if(myGameArea.keys && myGameArea.keys[38]){myGamePiece.speedY=-1;}
-    if(myGameArea.keys && myGameArea.keys[40]){myGamePiece.speedY=1;}
+    if (myGameArea.keys && myGameArea.keys[38]) { myGamePiece.speedY = -2; }
+    if (myGameArea.keys && myGameArea.keys[40]) { myGamePiece.speedY = 2; }
 
     myGamePiece.newPos();
     myGamePiece.update();
-    
 }
-
-
 
 
 function move(dir) {
@@ -252,7 +248,7 @@ function move(dir) {
         // case "right":
         //     myGamePiece.speedX = 2;
 
-       
+
     }
 }
 

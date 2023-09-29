@@ -14,12 +14,15 @@
     </style>
 </head>
 
-<body onload="startGame()" class="center-object">
-
+<body onload="startGame()" >
+    <div class="head">
+        <h1>Penguin racing boys</h1>
+        <p>Hãy dùng 2 phím lên và xuống để né các vật cản và ăn thật nhiều cá và nước ngọt.</p>
+    </div>
 
     <script src="static/js/game.js"></script>
 
-    <div style="text-align:center;width:640px;margin: auto;" >
+    <div class="ctrlBtn" >
         <button onmousedown="move('up')" onmouseup="clearMove()" ontouchstart="move('up')">UP</button><br><br>
         <!-- <button onmousedown="move('left')" onmouseup="clearMove()" ontouchstart="move('left')">LEFT</button>
         <button onmousedown="move('right')" onmouseup="clearMove()" ontouchstart="move('right')">RIGHT</button><br><br> -->
