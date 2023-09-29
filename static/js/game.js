@@ -1,18 +1,27 @@
 var myGamePiece;
 var myObstacles = [];
+var myBackground;
 var myGift = [];
 var myPrank = [];
 var myScore;
 var score = 0;
 var speed = 1;
-const birtWidth = 40;
-const birtHeight = 40;
-const tubeWidth = 40;
-const tubeHeight = 40;
+
+var eatSound;
+var awSound;
+
+const birtWidth = 46;
+const birtHeight = 46;
+const tubeWidth = 60;
+const tubeHeight = 60;
+const optimizeGiftSize = 35;
 
 function startGame() {
+    myBackground = new component(1200, 640, "static/images/sea3.png", 0, 0, "background");
     myGamePiece = new component(birtWidth, birtHeight, "static/images/penguinFly1.png", 40, 200, "image");
     myScore = new component("30px", "Consolas", "black", 400, 40, "text");
+    eatSound = new sound("static/sound/eating.MP3");
+    awSound = new sound("static/sound/aww.MP3");
     myGameArea.start();
     lastScoreIncreaseTime = Date.now();
 }
@@ -20,7 +29,7 @@ function startGame() {
 var myGameArea = {
     canvas: document.createElement("canvas"),
     start: function () {
-        this.canvas.width = 640;
+        this.canvas.width = 960;
         this.canvas.height = 480;
         this.canvas.id = ("canvas-game")
         this.context = this.canvas.getContext("2d");
@@ -40,7 +49,7 @@ var myGameArea = {
 
 function component(width, height, color, x, y, type, speed) {
     this.type = type;
-    if (type == "image") {
+    if (type == "image" || type == "background") {
         this.image = new Image();
         this.image.src = color;
     }
@@ -53,15 +62,17 @@ function component(width, height, color, x, y, type, speed) {
     this.speedType = speed;
     this.update = function () {
         ctx = myGameArea.context;
+        if (type == "background") {
+            ctx.drawImage(this.image, this.x + this.width, this.y, this.width, this.height);
+        } 
         if (this.type == "text") {
             ctx.font = this.width + " " + this.height;
             ctx.fillStyle = color;
             ctx.fillText(this.text, this.x, this.y);
-        }
-        else if (type == "image") {
+        } else if (type == "image" || type == "background") {
             ctx.drawImage(this.image,
                 this.x, this.y, this.width, this.height)
-        } else {
+        }else {
             ctx.fillStyle = color;
             ctx.fillRect(this.x, this.y, this.width, this.height);
         }
@@ -73,7 +84,11 @@ function component(width, height, color, x, y, type, speed) {
             this.y = 0;
         }
         if (this.y + this.height > myGameArea.canvas.height) {
-            this.y = myGameArea.canvas.height - this.height;}
+            this.y = myGameArea.canvas.height - this.height;
+        }
+        if (this.type == "background") {
+            if (this.x == -(this.width)) { this.x = 0 }
+        }
     }
 
     this.crashWith = function (otherObject) {
@@ -117,15 +132,18 @@ function createObject(speed) {
         // myObstacles.push(new component(tubeWidth, height, "green", x, 0));
         var areaHeight = myGameArea.canvas.height;
         for (i = 0; i < parseInt(speed / 2); i++) {
-            if(i==1){
-                myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale1.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image", "none"));
+            if (i == 1) {
+                myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale2.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image", "none"));
             }
         }
-        myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale1.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * (areaHeight / 3) + 1)), "image"));
-        myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale1.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * ((areaHeight / 3) * 2 - areaHeight / 3 + 1) + areaHeight / 3)), "image", "speed"));
-        myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale1.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * (areaHeight - areaHeight / 3 * 2 - 15) + areaHeight / 3 * 2 - 15)), "image", "speed"));
-        myGift.push(new component(tubeWidth, tubeHeight, "static/images/fish1.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image", "speed"));
-        myPrank.push(new component(tubeWidth, tubeHeight, "static/images/penguinBull1.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image", "speed"));
+        if (density % 20 == 0) {
+            myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale2.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image", "fast"));
+        }
+        myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale2.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * (areaHeight / 3) + 1)), "image"));
+        myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale2.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * ((areaHeight / 3) * 2 - areaHeight / 3 + 1) + areaHeight / 3)), "image", "speed"));
+        myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale2.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * (areaHeight - areaHeight / 3 * 2 - 15) + areaHeight / 3 * 2 - 15)), "image", "speed"));
+        myGift.push(new component(tubeWidth, tubeHeight-optimizeGiftSize, "static/images/fish2.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image", "speed"));
+        myPrank.push(new component(tubeWidth-optimizeGiftSize, tubeHeight-optimizeGiftSize+5, "static/images/penguinBull1.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image", "speed"));
     }
 
     createObstacle(myObstacles, speed);
@@ -140,16 +158,20 @@ function createObstacle(Obstacles, speed) {
         if (Obstacles[i].speedType == "none") {
             Obstacles[i].speedX = -1;
         }
+        if (Obstacles[i].speedType == "fast") {
+            Obstacles[i].speedX = -speed * 2;
+        }
         Obstacles[i].newPos();
         Obstacles[i].update();
     }
 }
 
 function updateGameArea() {
-
     for (i = 0; i < myObstacles.length; i++) {
         if (myGamePiece.crashWith(myObstacles[i])) {
             myGamePiece.image.src = "static/images/penguinSit1.png";
+            awSound.play();
+            // awSound.stop();
             setTimeout(function () {
                 myGameArea.stop();
                 return;
@@ -159,6 +181,8 @@ function updateGameArea() {
 
     for (i = 0; i < myGift.length; i++) {
         if (myGamePiece.crashWith(myGift[i])) {
+            eatSound.play();
+            // eatSound.stop();
             score += 100;
             myGift.splice(i, 1);
             speed -= 0.1;
@@ -167,6 +191,8 @@ function updateGameArea() {
     }
     for (i = 0; i < myPrank.length; i++) {
         if (myGamePiece.crashWith(myPrank[i])) {
+            eatSound.play();
+            // eatSound.stop();
             score += 150;
             myPrank.splice(i, 1);
             speed += 0.2;
@@ -177,6 +203,9 @@ function updateGameArea() {
     myGameArea.clear();
     myGameArea.frameNo++;
 
+    myBackground.speedX = -1;
+    myBackground.newPos();
+    myBackground.update();
 
     var currentTime = Date.now();
     if (currentTime - lastScoreIncreaseTime >= 5000) { // 10 giây
@@ -188,6 +217,8 @@ function updateGameArea() {
     // myScore.text = "Score: " + myGameArea.frameNo;
     myScore.text = "Score: " + score;
     myScore.update();
+
+
 
     myGamePiece.newPos();
     myGamePiece.update();
@@ -216,4 +247,28 @@ function clearMove() {
     myGamePiece.image.src = "static/images/penguinFly1.png";
     myGamePiece.speedX = 0;
     myGamePiece.speedY = 0;
+}
+
+function sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+
+    this.play = function () {
+        // Check if the audio can be played before attempting to play it
+        if (typeof this.sound.play === "function") {
+            this.sound.play()
+                .catch(function (error) {
+                    // Handle any errors that occur during playback
+                    console.error("Error playing audio:", error);
+                });
+        }
+    }
+
+    this.stop = function () {
+        this.sound.pause();
+    }
 }
