@@ -38,7 +38,7 @@ var myGameArea = {
 
 }
 
-function component(width, height, color, x, y, type) {
+function component(width, height, color, x, y, type, speed) {
     this.type = type;
     if (type == "image") {
         this.image = new Image();
@@ -50,6 +50,7 @@ function component(width, height, color, x, y, type) {
     this.y = y;
     this.speedX = 0;
     this.speedY = 0;
+    this.speedType = speed;
     this.update = function () {
         ctx = myGameArea.context;
         if (this.type == "text") {
@@ -68,6 +69,11 @@ function component(width, height, color, x, y, type) {
     this.newPos = function () {
         this.x += this.speedX;
         this.y += this.speedY;
+        if (this.y < 0) {
+            this.y = 0;
+        }
+        if (this.y + this.height > myGameArea.canvas.height) {
+            this.y = myGameArea.canvas.height - this.height;}
     }
 
     this.crashWith = function (otherObject) {
@@ -94,7 +100,11 @@ function everyinterval(n) {
     return false;
 }
 function createObject(speed) {
-    if (myGameArea.frameNo == 1 || everyinterval(250)) {
+    density = 250 - parseInt(speed * speed * 3);
+    if (density <= 50) { density = 50; }
+    console.log(speed)
+    console.log(density)
+    if (myGameArea.frameNo == 1 || everyinterval(density)) {
         x = myGameArea.canvas.width;
         minHeight = 20;
         maxHeight = tubeHeight;
@@ -106,11 +116,16 @@ function createObject(speed) {
         // myObstacles.push(new component(tubeWidth, x - height - gap, "green", x, height + gap))
         // myObstacles.push(new component(tubeWidth, height, "green", x, 0));
         var areaHeight = myGameArea.canvas.height;
-        myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale1.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * (areaHeight / 3) + 1)), "image"))
-        myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale1.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * ((areaHeight / 3) * 2 - areaHeight / 3 + 1) + areaHeight / 3)), "image"));
-        myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale1.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * (areaHeight - areaHeight / 3 * 2 - 15) + areaHeight / 3 * 2 - 15)), "image"));
-        myGift.push(new component(tubeWidth, tubeHeight, "static/images/fish1.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image"))
-        myPrank.push(new component(tubeWidth, tubeHeight, "static/images/penguinBull1.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image"))
+        for (i = 0; i < parseInt(speed / 2); i++) {
+            if(i==1){
+                myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale1.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image", "none"));
+            }
+        }
+        myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale1.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * (areaHeight / 3) + 1)), "image"));
+        myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale1.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * ((areaHeight / 3) * 2 - areaHeight / 3 + 1) + areaHeight / 3)), "image", "speed"));
+        myObstacles.push(new component(tubeWidth, tubeHeight, "static/images/whale1.png", (x + Math.floor((Math.random() * 30))), (Math.floor(Math.random() * (areaHeight - areaHeight / 3 * 2 - 15) + areaHeight / 3 * 2 - 15)), "image", "speed"));
+        myGift.push(new component(tubeWidth, tubeHeight, "static/images/fish1.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image", "speed"));
+        myPrank.push(new component(tubeWidth, tubeHeight, "static/images/penguinBull1.png", (Math.floor(Math.random() * (x - x / 2 + 1) + x / 2)), (Math.floor(Math.random() * (areaHeight) + 1)), "image", "speed"));
     }
 
     createObstacle(myObstacles, speed);
@@ -119,12 +134,14 @@ function createObject(speed) {
 
 }
 
-function createObstacle(Obstacle, speed) {
-    console.log(speed)
-    for (i = 0; i < Obstacle.length; i++) {
-        Obstacle[i].speedX = -speed;
-        Obstacle[i].newPos();
-        Obstacle[i].update();
+function createObstacle(Obstacles, speed) {
+    for (i = 0; i < Obstacles.length; i++) {
+        Obstacles[i].speedX = -speed;
+        if (Obstacles[i].speedType == "none") {
+            Obstacles[i].speedX = -1;
+        }
+        Obstacles[i].newPos();
+        Obstacles[i].update();
     }
 }
 
@@ -145,7 +162,7 @@ function updateGameArea() {
             score += 100;
             myGift.splice(i, 1);
             speed -= 0.1;
-            break; 
+            break;
         }
     }
     for (i = 0; i < myPrank.length; i++) {
@@ -153,17 +170,17 @@ function updateGameArea() {
             score += 150;
             myPrank.splice(i, 1);
             speed += 0.2;
-            break; 
+            break;
         }
     }
 
     myGameArea.clear();
     myGameArea.frameNo++;
 
-    
+
     var currentTime = Date.now();
-    if (currentTime - lastScoreIncreaseTime >= 10000) { // 10 giây
-        score += 100;
+    if (currentTime - lastScoreIncreaseTime >= 5000) { // 10 giây
+        score += 50;
         speed += 0.1;
         lastScoreIncreaseTime = currentTime;
     }
